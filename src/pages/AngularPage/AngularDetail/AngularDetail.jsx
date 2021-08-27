@@ -11,10 +11,7 @@ const AngularDetail = () => {
   const [angularDetail, setAngularDetail] = useState({});
   const [currentId, setCurrentId] = useState("");
 
-  const handleSubmit = (e) => {
-      e.preventDefault();
-    console.log(e);
-  };
+ 
 
   const { id } = useParams();
 
