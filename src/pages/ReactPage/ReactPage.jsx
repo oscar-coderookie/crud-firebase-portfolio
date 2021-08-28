@@ -1,4 +1,3 @@
-import { id } from "postcss-selector-parser";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import firebase from "../../config/firebase";
@@ -50,6 +49,7 @@ const ReactPage = () => {
           autoClose: 2000,
         });
         setCurrentId("");
+        setValues(INITIAL_STATE);
       }
     } catch (error) {
       console.error(error);
@@ -96,16 +96,20 @@ const ReactPage = () => {
   // function for send data to firebase:
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    addOrEdit(values);
-    setValues({ ...INITIAL_STATE });
+    if (values === "") {
+      toast('por favor inserta los datos')
+    } else {
+      addOrEdit(values);
+      setValues({ ...INITIAL_STATE });
+    }
   };
 
   return (
     <div style={{ height: "100vh" }} className="react-page d-flex align-items-start justify-content-center pt-5">
       <div className="container-xl">
+      <h1>Proyectos de React</h1>
         <div className="row">
-          <div className="col-10 col-md-6 mx-auto">
+          <div className="col-11 col-md-6 mx-auto">
             <div className="card p-0">
               <div className="card-body">
                 <div className="card-header bg-transparent py-2">
@@ -142,45 +146,44 @@ const ReactPage = () => {
                       value={values.deploy}
                     />
                   </div>
-                  <button type="submit" className="btn btn-primary w-100 my-2">
+                  <button type="submit" className="btn btn-secondary w-100 my-2">
                     {currentId === "" ? "Guardar Nuevo Proyecto" : "Actualizar Proyecto"}
                   </button>
                 </form>
               </div>
             </div>
           </div>
-          
         </div>
         <div className="row">
-            <div className="col-10 col-md-6 mx-auto">
-              <h2 className="py-3">Listado:</h2>
-              {reactProjects.map((project) => {
-                return (
-                  <div className="card my-2" key={project.id}>
-                    <div className="card-body">
-                      <p className="p-0 m-0">{project.title}</p>
-                    </div>
-                    <div className="card-footer">
-                      <span
-                        className="fas fa-edit"
-                        style={{ fontSize: 20, padding: 6, marginRight: 10, cursor: 'pointer' }}
-                        onClick={() => setCurrentId(project.id)}
-                      >
-                        Editar
-                      </span>
-                      <span
-                        style={{ fontSize: 20, padding: 6, marginRight: 10 , cursor: 'pointer' }}
-                        className="far fa-trash-alt"
-                        onClick={() => deleteReactProject(project.id)}
-                      >
-                        Eliminar
-                      </span>
-                    </div>
+          <div className="col-11 col-md-6 mx-auto">
+            <h2 className="py-3">Listado:</h2>
+            {reactProjects.map((project) => {
+              return (
+                <div className="card my-2" key={project.id}>
+                  <div className="card-body">
+                    <p className="p-0 m-0">{project.title}</p>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="card-footer">
+                    <span
+                      className="fas fa-edit"
+                      style={{ fontSize: 20, padding: 6, marginRight: 10, cursor: "pointer" }}
+                      onClick={() => setCurrentId(project.id)}
+                    >
+                      Editar
+                    </span>
+                    <span
+                      style={{ fontSize: 20, padding: 6, marginRight: 10, cursor: "pointer" }}
+                      className="far fa-trash-alt"
+                      onClick={() => deleteReactProject(project.id)}
+                    >
+                      Eliminar
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
+        </div>
       </div>
     </div>
   );

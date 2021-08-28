@@ -1,108 +1,187 @@
 import { useState, useEffect } from "react";
-import { NavLink, useParams } from "react-router-dom";
-import { createNewAngularProject, getAngularProjects } from "../../db/angularProjects";
-export const getNewAngularProject = (title, repository, deploy, thumb) => ({
-  title,
-  repository,
-  deploy,
-  thumb,
-});
+import { toast } from "react-toastify";
+import firebase from "../../config/firebase";
 
-const AngularPage = () => {
+const db = firebase.firestore();
+
+export const addOrEditLink = async (linkObject) => {
+  await db.collection("angular").doc().set(linkObject);
+};
+
+const AngularDetail = () => {
+
+  const INITIAL_STATE = {
+    title: "",
+    repository: "",
+    deploy: "",
+  };
+
+  const [values, setValues] = useState(INITIAL_STATE);
   const [angularProjects, setAngularProjects] = useState([]);
-  const { id } = useParams();
+  const [currentId, setCurrentId] = useState("");
 
   useEffect(() => {
-    getAngularProjects().then((response) => {
-      setAngularProjects(response);
-    });
+    getAngularProjects();
   }, []);
-  console.log(angularProjects);
-  console.log(id);
 
-  async function handleAddAngularProject(title, repository, deploy, thumb) {
-    const newAngularProject = getNewAngularProject(title, repository, deploy, thumb);
-    const createdAngularProject = await createNewAngularProject(newAngularProject);
+  const getAngularProjectById = async (id) => {
+    try {
+      const doc = await firebase.firestore().collection("angular").doc(id).get();
+      setValues({ ...doc.data() });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    setAngularProjects([...angularProjects, createdAngularProject]);
-  }
+  useEffect(() => {
+    if (currentId === "") {
+      setValues({ ...INITIAL_STATE });
+    } else {
+      getAngularProjectById(currentId);
+    }
+  }, [currentId]);
+
+  const addOrEdit = async (item) => {
+    try {
+      if (currentId === "") {
+        await firebase.firestore().collection("angular").doc().set(item);
+        toast("Proyecto Agregado correctamente", {
+          type: "success",
+          autoClose: 2000,
+        });
+      } else {
+        await firebase.firestore().collection("angular").doc(currentId).update(item);
+        toast("Proyecto actualizado correctamente", {
+          type: "info",
+          autoClose: 2000,
+        });
+        setCurrentId("");
+        setValues(INITIAL_STATE);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // function for get all projects in array:
+  const getAngularProjects = async () => {
+    try {
+      firebase
+        .firestore()
+        .collection("angular")
+        .onSnapshot((querySnapshot) => {
+          const docs = [];
+          querySnapshot.forEach((doc) => {
+            docs.push({ ...doc.data(), id: doc.id });
+          });
+          setAngularProjects(docs);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  // function to delete project:
+  const deleteAngularProject = async (id) => {
+    try {
+      if (window.confirm("estás seguro de eliminar el proyecto?")) {
+        await firebase.firestore().collection("angular").doc(id).delete();
+        toast("Proyecto eliminado de la base de datos..", {
+          type: "warning",
+          autoClose: 2000,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  // function for listen inputs: '',
+  const handleInputchange = (e) => {
+    const { name, value } = e.target;
+    setValues({ ...values, [name]: value });
+  };
+
+  // function for send data to firebase:
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    addOrEdit(values);
+    setValues({ ...INITIAL_STATE });
+  };
 
   return (
-    <div
-      className="angular-page d-flex align-items-center justify-content-center flex-column"
-      style={{ height: "100vh" }}
-    >
+    <div style={{ height: "100vh" }} className="angular-page d-flex align-items-start justify-content-center pt-5">
       <div className="container-xl">
+      <h1>Proyectos de Angular</h1>
         <div className="row">
-          <div className="col-10 col-lg-6 mx-auto">
-            <h2 className="py-5">Angular - Crear un nuevo trabajo:</h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const title = e.target[0].value.trim().toLowerCase();
-                const repository = e.target[1].value.trim().toLowerCase();
-                const deploy = e.target[2].value.trim().toLowerCase();
-                const thumb = e.target[3].files[0]; // Get the file from the input file
-                const fileType = thumb.type.split("/")[1];
-                const angularDirectory = "angularjs";
-
-                const filename = `${angularDirectory}/${id}.${fileType}`;
-
-                console.log(filename);
-
-                // handleAddAngularProject(title, repository, deploy, thumb);
-                // alert("Proyecto de Angular Guardado en la Base de Datos");
-                // e.target.reset();
-              }}
-            >
-              <div className="mb-3">
-                <label for="title" className="form-label">
-                  Título del trabajo
-                </label>
-                <input type="text" className="form-control" id="title" aria-describedby="title" />
+          <div className="col-11 col-md-6 mx-auto">
+            <div className="card p-0">
+              <div className="card-body">
+                <div className="card-header bg-transparent py-2">
+                  <h4 className="py-2">Formulario creación/edición</h4>
+                </div>
+                <form className="form" onSubmit={handleSubmit}>
+                  <div className="form-group py-2 ">
+                    <input
+                      type="text"
+                      name="title"
+                      className="form-control mt-3"
+                      placeholder="nombre del proyecto"
+                      onChange={handleInputchange}
+                      value={values.title}
+                    />
+                  </div>
+                  <div className="form-group py-2">
+                    <input
+                      type="text"
+                      name="repository"
+                      className="form-control"
+                      placeholder="url repositorio"
+                      onChange={handleInputchange}
+                      value={values.repository}
+                    />
+                  </div>
+                  <div className="form-group py-2">
+                    <input
+                      type="text"
+                      name="deploy"
+                      className="form-control"
+                      placeholder="url despliegue web"
+                      onChange={handleInputchange}
+                      value={values.deploy}
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-secondary w-100 my-2">
+                    {currentId === "" ? "Guardar Nuevo Proyecto" : "Actualizar Proyecto"}
+                  </button>
+                </form>
               </div>
-              <div className="mb-3">
-                <label for="repository" className="form-label">
-                  Enlace de rrepositorio
-                </label>
-                <input type="text" className="form-control" id="repository" />
-              </div>
-              <div className="mb-3">
-                <label for="deploy" className="form-label">
-                  Enlace de despliegue web:
-                </label>
-                <input type="text" className="form-control" id="deploy" />
-              </div>
-              <div className="mb-3">
-                <label for="thumb" className="form-label">
-                  Foto de perfil
-                </label>
-                <input
-                  type="file"
-                  className="form-control"
-                  id="thumb"
-                  name="file"
-                  accept="image/png, image/gif, image/jpeg"
-                />
-              </div>
-
-              <button type="submit" className="btn btn-primary">
-                Guardar
-              </button>
-            </form>
+            </div>
           </div>
-          <div className="col-10 col-lg-6 mx-auto">
-            <h2 className="py-5">Listado:</h2>
+        </div>
+        <div className="row">
+          <div className="col-11 col-md-6 mx-auto">
+            <h2 className="py-3">Listado:</h2>
             {angularProjects.map((project) => {
               return (
-                <div className="angular-projects">
-                  <div className="card my-4">
-                    <div className="card-body">
-                      <h4>{project.title}</h4>
-                      <NavLink exact to={`/angular/${project.id}`}>
-                        <button className="btn-block btn-primary btn w-100">Editar</button>
-                      </NavLink>
-                    </div>
+                <div className="card my-2" key={project.id}>
+                  <div className="card-body">
+                    <p className="p-0 m-0">{project.title}</p>
+                  </div>
+                  <div className="card-footer">
+                    <span
+                      className="fas fa-edit"
+                      style={{ fontSize: 20, padding: 6, marginRight: 10, cursor: "pointer" }}
+                      onClick={() => setCurrentId(project.id)}
+                    >
+                      Editar
+                    </span>
+                    <span
+                      style={{ fontSize: 20, padding: 6, marginRight: 10, cursor: "pointer" }}
+                      className="far fa-trash-alt"
+                      onClick={() => deleteAngularProject(project.id)}
+                    >
+                      Eliminar
+                    </span>
                   </div>
                 </div>
               );
@@ -114,4 +193,4 @@ const AngularPage = () => {
   );
 };
 
-export default AngularPage;
+export default AngularDetail;
