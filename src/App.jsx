@@ -9,6 +9,7 @@ import NodejsPage from "./pages/NodejsPage/NodejsPage";
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MobileHeader from "./components/MobileHeader/MobileHeader";
+import HtmlPage from "./pages/HtmlPage/HtmlPage";
 
 
 function App() {
@@ -48,6 +49,9 @@ function App() {
           </Route>
           <Route exact path="/nodejs">
             <NodejsPage/>
+          </Route>
+          <Route exact path="/html">
+            <HtmlPage/>
           </Route>
           <Route exact path="/">
             <Home />

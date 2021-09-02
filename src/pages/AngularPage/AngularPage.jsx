@@ -14,6 +14,7 @@ const AngularDetail = () => {
     title: "",
     repository: "",
     deploy: "",
+    timestamp: ""
   };
 
   const [values, setValues] = useState(INITIAL_STATE);
@@ -72,7 +73,7 @@ const AngularDetail = () => {
         .onSnapshot((querySnapshot) => {
           const docs = [];
           querySnapshot.forEach((doc) => {
-            docs.push({ ...doc.data(), id: doc.id });
+            docs.push({ ...doc.data(), id: doc.id, timestamp: firebase.firestore.Timestamp.fromDate(new Date("December 16, 2008")) });
           });
           setAngularProjects(docs);
         });
@@ -128,6 +129,7 @@ const AngularDetail = () => {
                       placeholder="nombre del proyecto"
                       onChange={handleInputchange}
                       value={values.title}
+                      required={true}
                     />
                   </div>
                   <div className="form-group py-2">
@@ -138,6 +140,7 @@ const AngularDetail = () => {
                       placeholder="url repositorio"
                       onChange={handleInputchange}
                       value={values.repository}
+                      required={true}
                     />
                   </div>
                   <div className="form-group py-2">
@@ -148,6 +151,7 @@ const AngularDetail = () => {
                       placeholder="url despliegue web"
                       onChange={handleInputchange}
                       value={values.deploy}
+                      required={true}
                     />
                   </div>
                   <button type="submit" className="btn btn-secondary w-100 my-2">

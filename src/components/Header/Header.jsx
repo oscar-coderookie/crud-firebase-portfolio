@@ -20,6 +20,9 @@ const Header = () => {
             <NavLink className="nav-link" exact to="/nodejs" style={{color:'black'}} >
                 <p className="p-0 m-0" style={{fontWeight: 400}}>Nodejs</p>
             </NavLink>
+            <NavLink className="nav-link" exact to="/html" style={{color:'black'}} >
+                <p className="p-0 m-0" style={{fontWeight: 400}}>Html</p>
+            </NavLink>
             
           </nav>
         </div>

@@ -6,24 +6,29 @@ const MobileHeader = () => {
       <div className="container-xl">
       
         <div className="row">
-        <div className="col-3 col-lg-2 mx-auto">
+        <div className="col-2 col-lg-2 mx-auto">
             <NavLink exact to="/">
               <span style={{fontSize:30, color: 'gray'}} className="fas fa-home"></span>
             </NavLink>
           </div>
-          <div className="col-3 col-lg-2 mx-auto">
+          <div className="col-2 col-lg-2 mx-auto">
             <NavLink exact to="/react">
               <span style={{fontSize:30, color: 'gray'}} className="fab fa-react"></span>
             </NavLink>
           </div>
-          <div className="col-3 col-lg-2 mx-auto">
+          <div className="col-2 col-lg-2 mx-auto">
             <NavLink exact to="/angular">
               <span style={{fontSize:30,color: 'gray'}} className="fab fa-angular"></span>
             </NavLink>
           </div>
-          <div className="col-3 col-lg-2 mx-auto">
+          <div className="col-2 col-lg-2 mx-auto">
             <NavLink exact to="/nodejs">
               <span style={{fontSize:30, color: 'gray'}} className="fab fa-node"></span>
+            </NavLink>
+          </div>
+          <div className="col-2 col-lg-2 mx-auto">
+            <NavLink exact to="/html">
+              <span style={{fontSize:30, color: 'gray'}} className="fab fa-html5"></span>
             </NavLink>
           </div>
           
