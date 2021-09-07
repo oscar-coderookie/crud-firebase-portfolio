@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-const MobileHeader = () => {
+const MobileHeader = ({ hasUser, onLogout }) => {
   return (
     <div className="header d-flex align-items-center justify-content-center" style={{height: '10vh', padding: 10}}>
       <div className="container-xl">
@@ -31,6 +31,12 @@ const MobileHeader = () => {
               <span style={{fontSize:30, color: 'gray'}} className="fab fa-html5"></span>
             </NavLink>
           </div>
+          {hasUser ? (
+        <button className="header-block__logout btn btn-default mx-3" onClick={onLogout}>
+        <span className="fas fa-sign-out-alt mx-2"></span>
+          Logout
+        </button>
+      ) : null}
           
         </div>
       </div>
